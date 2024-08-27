@@ -1,0 +1,30 @@
+.carousal{
+    display: flex;
+    align-items: center;
+    width: 500px;
+    height: 500px;
+    border: 2px solid pink;
+    gap: 10px;
+
+    /* deal with scroll */
+    overflow: hidden;
+    scrollbar-width: none;
+    scroll-snap-type:x  mandatory;
+}
+
+.carousal div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100%;
+    min-height: 100%;
+    scroll-snap-align: start;
+    object-fit: cover;
+}
+
+img{
+    width: 50%;
+    height: 100%;
+    object-fit:cover;
+    display: block;
+}
