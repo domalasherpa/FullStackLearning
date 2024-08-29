@@ -51,7 +51,7 @@ const validateRegister = ()=>{
             <form action="" @submit.prevent="validateRegister">
             <div class="fullname">
                 <input type="text" v-model="firstName" name="firstName" placeholder="First Name">
-                <input type="text" v-model="lastName" name="lastName" placeholder="Last Name">
+                <input type="text" v-model="lastName" name="lastName" placeholder="Last Name" style="margin-left: 10px;">
             </div>
 
             <div>
@@ -89,13 +89,13 @@ const validateRegister = ()=>{
                 </div>
 
                 <div class="three-option">
-                    <label for="male">Female</label>
-                    <input type="radio" v-model="gender" name="gender" value="female"/>
+                    <label for="female">Female</label>
+                    <input type="radio" v-model="gender" name="gender" value="female" id="female"/>
                 </div>
 
                 <div class="three-option">
-                    <label for="male">Custom</label>
-                    <input type="radio" v-model="gender" name="gender" value="custom"/>
+                    <label for="custom">Custom</label>
+                    <input type="radio" v-model="gender" name="gender" value="custom" id="custom"/>
                 </div>
             </div>
 
@@ -178,6 +178,7 @@ const validateRegister = ()=>{
         color: white;
         font-size: 20px;
         font-weight: bolder;
+        cursor: pointer;
         /* width: fit-content; */
     }
 </style>
