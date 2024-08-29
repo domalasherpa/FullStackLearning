@@ -4,40 +4,26 @@
 
     const carts = ref([]);
     const isCardVisible = true;
+    let products = ref([]);
 
-    const products = [
-            {
-                "name": "Wireless Mouse",
-                "price": 29.99,
-                "quantity": 150
-            },
-            {
-                "name": "Bluetooth Keyboard",
-                "price": 49.99,
-                "quantity": 75
-            },
-            {
-                "name": "HD Monitor",
-                "price": 199.99,
-                "quantity": 40
-            },
-            {
-                "name": "Smartphone Charger",
-                "price": 15.99,
-                "quantity": 300
-            },
-            {
-                "name": "Backpack",
-                "price": 89.99,
-                "quantity": 60
-            }
-    ];
+    const getProducts = async()=>{
+        try{
+            const res = await fetch("https://fakestoreapi.com/products");
+            products.value = await res.json();
+        }
+        catch(err){
+            console.log("Error fetching data");
+        }
+    }
 
     const addTocart = (product, index)=>{
         carts.value.push(product);
         products[index].quantity -= 1;
         console.log(carts);
     }
+
+    
+    getProducts();
 
 </script>
 
@@ -57,13 +43,23 @@
         </div>
 
         <div class="products">
-            <div v-for="(product, index) in products" :key="index" >
-                <ul v-if="product.quantity > 0">
-                    <li>product name: {{ product.name }}</li>
-                    <li>product price: {{ product.price}}</li>
-                    <li>product quantity: {{ product.quantity }}</li>
-                </ul>
+
+            <div v-if="products.length>0" v-for="(product, index) in products" :key="index" >
+                <img :src="product.image" alt="" style="height: 100px; object-fit: contain;">
+                <table>
+                    <tr>
+                        <td>Product Name</td>
+                        <td>{{ product.title }}</td>
+                    </tr>
+                    <tr>
+                        <td>Product Price</td>
+                        <td>{{ product.price }}</td>
+                    </tr>
+                </table>
                 <button @click="addTocart(product, index)">Add to cart</button>
+            </div>
+            <div v-else>
+                Loading...
             </div>
         </div>
     </div>
