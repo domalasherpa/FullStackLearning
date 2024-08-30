@@ -1,16 +1,7 @@
 <script setup>
 
 import { ref } from "vue";
-
-const currentYear = new Date().getFullYear();
-const currentMonth = new Date().getMonth();
-const currentDate = new Date().getDate();
-const baseYear = 1904; //yo 
-
-const firstName = ref('');
-const lastName = ref('');
-const phoneNumber = ref('');
-const password = ref('');
+import inputError from "./inputError.vue";
 
 const months = [
     "Jan",
@@ -27,77 +18,140 @@ const months = [
     "Dec"
 ];
 
-const selectedMonth = ref(months[currentMonth]);
-const selectedDate = ref(currentDate);
-const selectedYear = ref(currentYear);
-const gender = ref('');
+const currentDate = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    date: new Date().getDate()
+}
 
+const baseYear = 1904;
 
+const defaultData = {
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    password: '',
+    selectedMonth: months[currentDate.month],
+    selectedDate: currentDate.date,
+    selectedYear: currentDate.year,
+    gender: ''
+}
+
+const defaultError = {
+    firstName: false,
+    lastName: false,
+    phoneNumber: false,
+    password: false,
+    selectedMonth: false,
+    selectedDate: false,
+    selectedYear: false,
+    gender: false,
+    flag: false
+};
+
+const userData = ref(defaultData);
+
+const errors = ref(defaultError);
 
 const validateRegister = ()=>{
-    //yo aba voli lekhne
+    errors.value = defaultError;
+    
+    for(const [key, data] of Object.entries(userData.value)){
+        if(data == ''){
+            errors.value[key] = true;
+            errors.value['flag'] = true;
+        }
+        console.log(key, "\n", data);
+    }
+    
+    if(!months.includes(userData.value.selectedMonth)){
+        errors.value.selectedMonth = true;
+        errors.value[flag] = true;
+    }
+
+    if(userData.selectedYear > currentDate.year || userData.selectedYear < baseYear + 1){
+        errors.value.selectedYear = true;
+        errors.value[flag] = true;
+    }
+
+    userData.value = defaultData;
+}
+
+const register = ()=>{
+    validateRegister();
+    if(!errors.value.flag){
+        //send data to backend
+        alert("sucessfully registered");
+    }else{
+        errors.value.flag = false;
+    }
 }
 
 </script>
 
 <template>
     <div class="container">
-        
         <div class="register-form-container">
             <div class="form-header">
                 <h1>Sign Up</h1>
                 <p>It's quick and easy</p>
             </div>
-            <form action="" @submit.prevent="validateRegister">
+            <form action="" @submit.prevent="register">
             <div class="fullname">
-                <input type="text" v-model="firstName" name="firstName" placeholder="First Name">
-                <input type="text" v-model="lastName" name="lastName" placeholder="Last Name" style="margin-left: 10px;">
+                <input type="text" v-model="userData.firstName" placeholder="First Name"  >
+                <input type="text" v-model="userData.lastName" name="lastName" placeholder="Last Name" style="margin-left: 10px;">
             </div>
+            
+            <inputError v-show="errors.firstName && !userData.firstName" text="First Name is required"/>
+            <inputError v-show="errors.lastName && !userData.lastName" text="Last Name is required"/>
+            
 
             <div>
-                <input type="text" v-model="phoneNumber" name="phoneNumber" placeholder="Mobile number or email">
+                <input type="text" v-model="userData.phoneNumber" placeholder="Mobile number or email">
             </div>
+            <inputError v-show="errors.phoneNumber && !userData.phoneNumber" text="PhoneNumber is required"/>
+
 
             <div>
-                <input type="text" v-model="password" name="password" placeholder="New password">
+                <input type="text" v-model="userData.password" placeholder="New password">
             </div>
+            <inputError v-show="errors.password && !userData.password" text="Password is required"/>
 
             <label for="">Birthday</label>
             <div class="bday">    
-                <select name="month" id="" v-model="selectedMonth" class="">
-                    <option v-for="(month,index) in months" value="month" :key="month" >{{ month }}</option>
-                    <option :value="selectedMonth" :key="selectedMonth" >{{ selectedMonth }}</option>
+                <select name="month" id="" v-model="userData.selectedMonth" class="">
+                    <option v-for="(month,index) in months" :value="month" :key="month" >{{ month }}</option>
                 </select>
 
-                <select name="day" id="" v-model="selectedDate">
-                    <option v-for="day in 31" value="day" :key="day">{{ day }}</option>
-                    <option :value="selectedDate" :key="selectedDate">{{ selectedDate }}</option>
+                <select name="day" id="" v-model="userData.selectedDate">
+                    <option v-for="day in 31" :value="day" :key="day">{{ day }}</option>
                 </select>
 
-                <select name="year" id="" v-model="selectedYear">
-                    <option v-for="year in (currentYear - baseYear)" value="currentYear - year + 1" :key="year">{{ currentYear - year + 1}}</option>
-                    <option :value="selectedYear" :key="selectedYear">{{ selectedYear }}</option>
+                <select name="year" id="" v-model="userData.selectedYear">
+                    <option v-for="year in (currentDate.year - baseYear)" :key="year">{{ currentDate.year - year + 1}}</option>
                 </select>
             </div>
+            <inputError v-show="errors.selectedDate || errors.selectedMonth || errors.selectedYear" text="please enter a valid date"/>
 
             <label for="">Gender</label>
             <div class="gender">
                 <div class="three-option">
                     
                     <label for="male">Male</label>
-                    <input type="radio" v-model="gender" name="gender" value="male" id="male"/>
+                    <input type="radio" v-model="userData.gender" value="male" id="male" />
                 </div>
 
                 <div class="three-option">
                     <label for="female">Female</label>
-                    <input type="radio" v-model="gender" name="gender" value="female" id="female"/>
+                    <input type="radio" v-model="userData.gender" value="female" id="female"/>
                 </div>
 
                 <div class="three-option">
                     <label for="custom">Custom</label>
-                    <input type="radio" v-model="gender" name="gender" value="custom" id="custom"/>
+                    <input type="radio" v-model="userData.gender" value="custom" id="custom"/>
                 </div>
             </div>
+            <inputError v-show="errors.gender && !userData.gender" text="please select the valid option"/>
 
             <div class="btn-div">
                 <button>Sign Up</button>
