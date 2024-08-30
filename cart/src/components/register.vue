@@ -81,6 +81,7 @@ const register = ()=>{
     validateRegister();
     if(!errors.value.flag){
         //send data to backend
+        localStorage.setItem('user', JSON.stringify(userData));
         alert("sucessfully registered");
     }else{
         errors.value.flag = false;
@@ -98,8 +99,8 @@ const register = ()=>{
             </div>
             <form action="" @submit.prevent="register">
             <div class="fullname">
-                <input type="text" v-model="userData.firstName" placeholder="First Name"  >
-                <input type="text" v-model="userData.lastName" name="lastName" placeholder="Last Name" style="margin-left: 10px;">
+                <input type="text" v-model="userData.firstName" placeholder="First Name" :class="{error: errors.firstName && !userData.firstName}" >
+                <input type="text" v-model="userData.lastName" name="lastName" placeholder="Last Name" style="margin-left: 10px;" :class="{error: errors.lastName && !userData.lastName}">
             </div>
             
             <inputError v-show="errors.firstName && !userData.firstName" text="First Name is required"/>
@@ -162,8 +163,10 @@ const register = ()=>{
 </template>
 
 
-
 <style scoped>
+    .error{
+        border: 1px solid red;
+    }
     .container{
         height: 100vh;
         display: flex;
