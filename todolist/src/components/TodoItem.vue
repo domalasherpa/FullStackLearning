@@ -42,8 +42,8 @@ const removeTodo = ()=>{
 	gap: 10px;
 	align-items: center;
 	justify-content: space-between;
-	border: 1px solid black;
-	padding: 30px 10px;
+	/* border: 1px solid black; */
+	padding: 20px 10px;
 }
 
 </style>
