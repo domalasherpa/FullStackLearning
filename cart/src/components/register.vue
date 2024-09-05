@@ -81,7 +81,7 @@ const register = ()=>{
     validateRegister();
     if(!errors.value.flag){
         //send data to backend
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(userData.value));
         alert("sucessfully registered");
     }else{
         errors.value.flag = false;
