@@ -1,58 +1,97 @@
 <script setup>
 import { carts } from '../data/data';
+import { computed, ref, toDisplayString, watch } from "vue";
 
+const selectedItemsIndex = ref([]);
+const allSelected = ref(false);
+
+watch([selectedItemsIndex, allSelected], (selectedItemsIndex, allSelected)=>{
+    if(allSelected === true){
+        selectedItems.value = carts.value;
+        selectedItemsIndex.value =  Array.from(Array(carts.value.length).keys());
+    }
+    else{
+        allSelected = false;
+        selectedItems.value = []
+        selectedItemsIndex.value = []
+    }
+})
+
+const selectedItems = computed(()=>{
+    const arr = selectedItemsIndex?.value.map(i=>{
+        return carts.value[i];
+    });
+    console.log(arr);
+    return arr;
+});
+
+const total = computed(()=>{
+    return selectedItems?.value.reduce((total, item)=>total+item.price*item.quantity, 0);
+})
+
+//write the logic for all selection
 </script>
 
 <template>
 
 
-<div class="w-full flex flex-col items-center mb-8">
-    <h1 class="text-xl text-gray-600 font-bold my-2">Cart Items</h1>
-    <table class="w-9/12 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-16 py-3">
-                    <span class="sr-only">Image</span>
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Product
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Qty
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Price
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Action
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <template v-for="product in carts">
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-xs">
-                <td class="p-4">
-                    <img :src="product.image" class="md:w-16 max-w-full max-h-full" alt="iPhone 12">
-                </td>
-                <td class="px-6 py-4 font-semibold  text-gray-900 dark:text-white">
-                    {{ product.title }}
-                </td>
-                <td class="px-6 py-4 font-semibold">
-                    {{ product.quantity }}
-                </td>
-                <td class="px-6 py-4 font-semibold text-orange-500 dark:text-white">
-                    {{product.price}}
-                </td>
-                <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
-                </td>
-            </tr>
-            </template>
-        </tbody>
-    </table>
-</div>
+    <div class="w-full flex flex-col items-center mb-8">
+        <h1 class="text-xl text-gray-600 font-bold my-2">My Cart</h1>
+        <table class="w-9/12 text-sm text-left rtl:text-right text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-2 py-3">
+                        <input type="checkbox" class="cursor-pointer" v-model="allSelected">
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        <span class="sr-only">Image</span>
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Product
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Qty
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Price
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white border-b hover:bg-gray-50 text-xs" v-for="(product, index) in carts" :key="index">
+                    <td class="px-2 py-4">
+                        <input type="checkbox" v-model="selectedItemsIndex" :value="index" class="cursor-pointer" :checked="allSelected" :key="index"/>
+                    </td>
+                    <td class="p-4">
+                        <img :src="product.image" class="md:w-16 max-w-full max-h-full" :alt="product.title">
+                    </td>
+                    <td class="px-6 py-4 font-semibold  text-gray-900">
+                        {{ product.title }}
+                    </td>
+                    <td class="px-6 py-4 font-semibold">
+                        {{ product.quantity }}
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-orange-500">
+                        {{ product.price }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <a href="#" class="font-medium text-red-600 hover:underline">Remove</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="flex gap-4 items-center">
+        <div>
+            <span>Subtotal:</span>
+            <span>{{ total }}</span>
+        </div>
+        <button class="bg-orange-500 px-4 py-1 rounded-sm">Check Out</button> -->
+    </div>
 
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
