@@ -54,10 +54,12 @@
     <div v-if="loading" class="text-center">
         <p class="">Loading....</p>
     </div>
-    <div v-else class="flex flex-col justify-center">
-        <div class="m-4 md:w-1/2 max-h-80 flex space-x-10 border-2">
-            <div class="w-1/2 h-auto overflow-hidden"><img :src="product.image" :alt="product.image" class="p-2 h-full w-full object-contain"></div>
-            <div class="flex flex-col space-y-2">
+    <div v-else class="flex flex-col w-screen items-center">
+        <div class="m-4 lg:w-1/2 flex-row md:flex space-x-10 border-2 py-4">
+            <div class="h-40 lg:min-h-80 md:w-1/2">
+                <img :src="product.image" :alt="product.image" class="p-2 h-full w-full object-contain">
+            </div>
+            <div class="flex flex-col space-y-2 md:w-1/2">
                 <div>
                     <h1 class="text-xl font-semibold my-4">{{ product.title }}</h1>
                     <p class="space-x-4"><span class="text-gray-600 font-bold">Price: </span><span class="text-gray-500 font-semibold">Rs. {{ product.price }}</span></p>
@@ -67,7 +69,7 @@
                     <p>Quantity</p>
                     <div class="space-x-4">
                         <button @click="handleQuantityDcr">-</button>
-                         <input class="w-6 text-center border-2 border-gray-200" v-model="cartItem.quantity"/>
+                         <input class="w-10 text-center border-2 border-gray-200" v-model="cartItem.quantity"/>
                         <button @click="handleQuantityInc">+</button>
                     </div>
                 </div>
@@ -77,7 +79,7 @@
                 </div>
             </div>
         </div>
-        <div class="md:w-1/2 mx-4  space-y-4">
+        <div class="lg:w-1/2 mx-4  space-y-4">
             <h1 class="sm:text-sm md:text-xl font-bold text-gray-600">Product Description</h1>
             <p class="text-gray-500 font-semibold sm:text-xs md:text-sm">{{ product.description }}</p>
         </div>
