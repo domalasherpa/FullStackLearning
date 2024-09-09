@@ -3,38 +3,29 @@ import { carts } from '../data/data';
 import { computed, ref, toDisplayString, watch } from "vue";
 
 const selectedItemsIndex = ref([]);
+const total = ref(0);
+
 const allSelected = ref(false);
-
-watch([selectedItemsIndex, allSelected], (selectedItemsIndex, allSelected)=>{
-    if(allSelected === true){
-        selectedItems.value = carts.value;
-        selectedItemsIndex.value =  Array.from(Array(carts.value.length).keys());
-    }
-    else{
-        allSelected = false;
-        selectedItems.value = []
-        selectedItemsIndex.value = []
-    }
-})
-
 const selectedItems = computed(()=>{
-    const arr = selectedItemsIndex?.value.map(i=>{
-        return carts.value[i];
-    });
-    console.log(arr);
-    return arr;
+    return selectedItemsIndex?.value.map(i=>carts.value[i])
 });
 
-const total = computed(()=>{
-    return selectedItems?.value.reduce((total, item)=>total+item.price*item.quantity, 0);
-})
 
-//write the logic for all selection
+watch(allSelected, ()=>{
+    if(allSelected.value === true){
+        selectedItemsIndex.value =  Array.from(Array(carts.value.length).keys());       //to set all the index selected
+    }
+    else{
+        selectedItemsIndex.value = []
+    }
+});
+
+watch(selectedItems, ()=>{
+    total.value = selectedItems?.value.reduce((total, item)=>total+item.price*item.quantity, 0);
+})
 </script>
 
 <template>
-
-
     <div class="w-full flex flex-col items-center mb-8">
         <h1 class="text-xl text-gray-600 font-bold my-2">My Cart</h1>
         <table class="w-9/12 text-sm text-left rtl:text-right text-gray-500">
@@ -78,7 +69,8 @@ const total = computed(()=>{
                         {{ product.price }}
                     </td>
                     <td class="px-6 py-4">
-                        <a href="#" class="font-medium text-red-600 hover:underline">Remove</a>
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        <button class="font-medium text-red-600 hover:underline">Remove</button>
                     </td>
                 </tr>
             </tbody>
@@ -89,7 +81,7 @@ const total = computed(()=>{
             <span>Subtotal:</span>
             <span>{{ total }}</span>
         </div>
-        <button class="bg-orange-500 px-4 py-1 rounded-sm">Check Out</button> -->
+        <button class="bg-orange-500 px-4 py-1 rounded-sm">Check Out</button>
     </div>
 
 </template>
