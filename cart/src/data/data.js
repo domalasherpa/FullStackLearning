@@ -1,4 +1,4 @@
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 
 export const products = ref([]);
-export const carts = ref([]);
+export const carts = reactive({});

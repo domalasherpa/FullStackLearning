@@ -54,8 +54,7 @@ export default {
 
         <input type="radio" id="two" value="Two" v-model="picked" />
         <label for="two">Two</label>
-
-
+        
         <h1>Multiple select</h1>
         <div>Selected: {{selected}}</div>
         <select v-model="selected" multiple>
