@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import ProductSingle from "../components/productSingle.vue";
+import ProductSingle from "../components/ProductSingle.vue";
 import { products } from "../data/data";
 const loading = ref(true);
 
