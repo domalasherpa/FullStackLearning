@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import ProductSingle from "../components/ProductSingle.vue";
-import { products } from "../data/data";
 const loading = ref(true);
 
+const products = ref([]);
 const getProducts = async () => {
     try {
         const res = await fetch("https://fakestoreapi.com/products");
