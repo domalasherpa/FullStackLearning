@@ -1,10 +1,13 @@
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import { watch, ref, reactive } from 'vue';
 import { useCartStore } from '../stores/CartStore';
+import {useSelectedItems} from "../stores/SelectedStore";
 
 const route = useRoute();
+const router = useRouter();
 const carts = useCartStore();
+const selectedStore = useSelectedItems();
 
 const loading = ref(false);
 const product = reactive({});
@@ -58,6 +61,12 @@ const handleInputQuantity = (event) => {
 		quantity.value = inputQuantity;
 	}
 }
+
+const handleBuyNow = ()=>{
+	carts.addItem(product, quantity.value);
+	selectedStore.addItem(carts.carts[product.id]);
+	router.push({ path:'/checkout'});
+}
 </script>
 
 <template>
@@ -87,7 +96,7 @@ const handleInputQuantity = (event) => {
 					</div>
 				</div>
 				<div class="space-x-2 w-full flex">
-					<button class="bg-blue-400 px-4 py-1 font-semibold text-white">Buy Now</button>
+					<button class="bg-blue-400 px-4 py-1 font-semibold text-white" @click="handleBuyNow">Buy Now</button>
 					<button class="bg-orange-400 px-4 py-1 font-semibold text-white" @click="addTocart">Add to
 						Cart</button>
 				</div>
