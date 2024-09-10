@@ -1,13 +1,10 @@
 <script setup>
 import { computed, reactive, ref } from 'vue';
-import { carts, products } from "../data/data";
+import { useCartStore } from '../stores/CartStore';
 
+const CartStore = useCartStore();
 const selectedItems = reactive({});
 const allSelected = ref(false);
-
-const isCartEmpty = computed(() => {
-	return Object.entries(carts).length === 0;
-});
 
 const total = computed(() => {
 	const temp = Object.values(selectedItems).reduce((acc, item) => acc + item.quantity * item.price, 0);
@@ -16,8 +13,8 @@ const total = computed(() => {
 
 const selectAll = (event) => {
 	if (event.target.checked) {
-		Object.keys(carts).forEach(productId => {
-			selectedItems[productId] = carts[productId];
+		Object.keys(CartStore.carts).forEach(productId => {
+			selectedItems[productId] = CartStore.carts[productId];
 		});
 	} else {
 		Object.keys(selectedItems).forEach(productId => {
@@ -29,7 +26,7 @@ const selectAll = (event) => {
 
 // if all are not selected or if one unselected then change state of allSelected
 const updateAllSelectedState = () => {
-	const totalItems = Object.keys(carts).length;
+	const totalItems = CartStore.cartsSize;
 	const selectedItemsCount = Object.keys(selectedItems).length;
 	allSelected.value = totalItems === selectedItemsCount;
 };
@@ -38,49 +35,39 @@ const handleCheckboxToggle = (productId) => {
 	if (selectedItems[productId]) {
 		delete selectedItems[productId];
 	} else {
-		selectedItems[productId] = carts[productId];
+		selectedItems[productId] = CartStore.carts[productId];
 	}
 	updateAllSelectedState();
 };
 
 const removeProduct = (productId) => {
-	delete carts[productId];
+	CartStore.removeItem(productId);
 	delete selectedItems[productId];
+	console.log(CartStore.carts);
 	updateAllSelectedState();
 };
 
-const handleCheckout = () => { //check for condn and route-link
+const handleCheckout = () => {
 	alert('Proceeding to checkout');
-
 };
 
-const handleQuantityDcr = (productId) => {
-	if (carts[productId].quantity > 1) {
-		carts[productId].quantity -= 1;
-	}
-};
+const handleQuantityDcr = (productId) => {CartStore.decreaseQnty(productId)};
 
-const handleQuantityInc = (productId) => {
-	if (carts[productId].quantity < carts[productId].availableQuantity) { //replace the available quanity with dynamic data
-		carts[productId].quantity += 1;
-	} else {
-		alert("Please choose up to the available quantity only.");
-	}
-};
+const handleQuantityInc = (productId) => {CartStore.increaseQnty(productId)};
 
 const handleInputQuantity = (event, productId) => {
 	const inputQuantity = parseInt(event.target.value, 10);
-	if (isNaN(inputQuantity) || inputQuantity < 1 || inputQuantity > carts[productId].availableQuantity) {
-
+	if (isNaN(inputQuantity) || inputQuantity < 1 || inputQuantity > CartStore.carts[productId].availableQuantity) {
+		event.target.value = CartStore.carts[productId].quantity;
 		alert("please enter a valid quantity");
 	} else {
-		carts[productId].quantity = inputQuantity;
+		CartStore.setQuantity(inputQuantity);
 	}
 }
 </script>
 
 <template>
-	<div v-if="isCartEmpty">
+	<div v-if="CartStore.isCartEmpty">
 		<p>Whoops! your cart is empty.</p>
 	</div>
 	<div v-else class="w-full flex flex-col items-center mb-8">
@@ -101,7 +88,7 @@ const handleInputQuantity = (event, productId) => {
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(product) in carts" :key="product.id" class="bg-white border-b hover:bg-gray-50 text-xs">
+				<tr v-for="(product) in CartStore.carts" :key="product.id" class="bg-white border-b hover:bg-gray-50 text-xs">
 					<td class="px-2 py-4">
 						<input type="checkbox" :value="product.id" class="cursor-pointer"
 							:checked="product.id in selectedItems" @change="handleCheckboxToggle(product.id)" />
@@ -112,11 +99,11 @@ const handleInputQuantity = (event, productId) => {
 					<td class="px-6 py-4 font-semibold text-gray-900">{{ product.title }}</td>
 					<td class="px-6 py-4 font-semibold">
 						<div class="space-x-4">
-							<button @click="handleQuantityDcr(product.id)">-</button>
+							<button @click="handleQuantityDcr(product.id)" class="w-5">-</button>
 							<input class="w-10 text-center border-2 border-gray-200" type="text"
 								:value="product.quantity" @change="handleInputQuantity($event, product.id)"
 								placeholder="1" />
-							<button @click="handleQuantityInc(product.id)">+</button>
+							<button @click="handleQuantityInc(product.id)" class="w-5">+</button>
 						</div>
 					</td>
 					<td class="px-6 py-4 font-semibold text-orange-500">{{ product.price }}</td>
