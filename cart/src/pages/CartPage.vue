@@ -1,24 +1,23 @@
 <script setup>
 import { computed, reactive, ref } from 'vue';
 import { useCartStore } from '../stores/CartStore';
+import { useRouter } from 'vue-router';
+import { useSelectedItems } from '../stores/SelectedStore';
 
 const CartStore = useCartStore();
-const selectedItems = reactive({});
-const allSelected = ref(false);
+const selectedItemsStore = useSelectedItems();
 
-const total = computed(() => {
-	const temp = Object.values(selectedItems).reduce((acc, item) => acc + item.quantity * item.price, 0);
-	return parseFloat(temp.toFixed(2));
-});
+const allSelected = ref(false);
+const router = useRouter();
 
 const selectAll = (event) => {
 	if (event.target.checked) {
 		Object.keys(CartStore.carts).forEach(productId => {
-			selectedItems[productId] = CartStore.carts[productId];
+			selectedItemsStore.addItem(CartStore.carts[productId]);
 		});
 	} else {
-		Object.keys(selectedItems).forEach(productId => {
-			delete selectedItems[productId];
+		Object.keys(selectedItemsStore.selectedItems).forEach(productId => {
+			selectedItemsStore.removeItem(productId);
 		});
 	}
 	allSelected.value = event.target.checked;
@@ -26,29 +25,27 @@ const selectAll = (event) => {
 
 // if all are not selected or if one unselected then change state of allSelected
 const updateAllSelectedState = () => {
-	const totalItems = CartStore.cartsSize;
-	const selectedItemsCount = Object.keys(selectedItems).length;
-	allSelected.value = totalItems === selectedItemsCount;
+	allSelected.value = CartStore.cartsSize === selectedItemsStore.selectedItemsCount;
 };
 
 const handleCheckboxToggle = (productId) => {
-	if (selectedItems[productId]) {
-		delete selectedItems[productId];
+	if (productId in selectedItemsStore.selectedItems) {
+		selectedItemsStore.removeItem(productId);
 	} else {
-		selectedItems[productId] = CartStore.carts[productId];
+		selectedItemsStore.addItem(CartStore.carts[productId]);
 	}
 	updateAllSelectedState();
 };
 
 const removeProduct = (productId) => {
 	CartStore.removeItem(productId);
-	delete selectedItems[productId];
+	selectedItemsStore.removeItem(productId);
 	console.log(CartStore.carts);
 	updateAllSelectedState();
 };
 
 const handleCheckout = () => {
-	alert('Proceeding to checkout');
+	router.push({ path:'/checkout'});
 };
 
 const handleQuantityDcr = (productId) => {CartStore.decreaseQnty(productId)};
@@ -72,7 +69,7 @@ const handleInputQuantity = (event, productId) => {
 	</div>
 	<div v-else class="w-full flex flex-col items-center mb-8">
 		<h1 class="text-xl text-gray-600 font-bold my-2">My Cart</h1>
-		<table class="w-9/12 text-sm text-left rtl:text-right text-gray-500">
+		<table class="w-full md:w-9/12 text-sm text-left rtl:text-right text-gray-500">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50">
 				<tr>
 					<th scope="col" class="px-2 py-3">
@@ -91,14 +88,14 @@ const handleInputQuantity = (event, productId) => {
 				<tr v-for="(product) in CartStore.carts" :key="product.id" class="bg-white border-b hover:bg-gray-50 text-xs">
 					<td class="px-2 py-4">
 						<input type="checkbox" :value="product.id" class="cursor-pointer"
-							:checked="product.id in selectedItems" @change="handleCheckboxToggle(product.id)" />
+							:checked="product.id in selectedItemsStore.selectedItems" @change="handleCheckboxToggle(product.id)" />
 					</td>
-					<td class="p-4">
+					<td class="py-1">
 						<img :src="product.image" class="md:w-16 max-w-full max-h-full" :alt="product.title">
 					</td>
-					<td class="px-6 py-4 font-semibold text-gray-900">{{ product.title }}</td>
-					<td class="px-6 py-4 font-semibold">
-						<div class="space-x-4">
+					<td class="px-6 py-4 font-semibold text-gray-900"><router-link :to="{name: 'productDetails', params:{id: product.id}}">{{ product.title }}</router-link></td>
+					<td class="font-semibold">
+						<div class="space-x-2">
 							<button @click="handleQuantityDcr(product.id)" class="w-5">-</button>
 							<input class="w-10 text-center border-2 border-gray-200" type="text"
 								:value="product.quantity" @change="handleInputQuantity($event, product.id)"
@@ -113,14 +110,16 @@ const handleInputQuantity = (event, productId) => {
 				</tr>
 			</tbody>
 		</table>
-		<div class="flex gap-4 items-center">
-			<div class="space-x-2">
-				<span class="text-gray-600 font-bold">Subtotal:</span>
-				<span class="font-semibold text-orange-500">Rs. {{ total }}</span>
+		<div class="fixed bottom-0 bg-white w-full h-16">
+			<div class="flex gap-4 items-center justify-center">
+				<div class="space-x-2">
+					<span class="text-gray-600 font-bold">Subtotal:</span>
+					<span class="font-semibold text-orange-500">Rs. {{ selectedItemsStore.total }}</span>
+				</div>
+				<button class="bg-orange-500 px-4 py-1 rounded-sm text-white font-semibold" @click="handleCheckout">
+					Check Out
+				</button>
 			</div>
-			<button class="bg-orange-500 px-4 py-1 rounded-sm text-white font-semibold" @click="handleCheckout">
-				Check Out
-			</button>
 		</div>
 	</div>
 </template>
