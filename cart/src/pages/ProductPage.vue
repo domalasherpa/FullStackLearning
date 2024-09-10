@@ -97,6 +97,5 @@ const handleInputQuantity = (event) => {
 			<h1 class="sm:text-sm md:text-xl font-bold text-gray-600">Product Description</h1>
 			<p class="text-gray-500 font-semibold sm:text-xs md:text-sm">{{ product.description }}</p>
 		</div>
-		{{ carts.carts }}
 	</div>
 </template>
